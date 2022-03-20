@@ -38,8 +38,10 @@ def generate_attribute_combinations(attributes):
     attribute_combinations = itertools.combinations(distinct_attributes, len(attributes))
 
     combinations_list = []
+    combination_number = 1
 
     for combination in attribute_combinations:
-        combinations_list.append(combination)
+        combinations_list.append((combination, combination_number))
+        combination_number += 1
 
     return combinations_list
