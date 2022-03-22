@@ -5,6 +5,8 @@ AI Project 3
 from tkinter import *
 from tkinter import filedialog, simpledialog
 
+import functions
+
 root = None
 
 attributes_text_view = None
@@ -149,12 +151,37 @@ def create_text_inputs():
     preferences_text_view.grid(column=3, row=5, columnspan=2, rowspan=2, pady=5)
 
 
+def create_function_buttons():
+    feasible_objects = Button(text='Feasible Objects',
+                              command=lambda: functions.feasible_objects(attributes_text, constraints_text,
+                                                                         preferences_text, preferences_type))
+    exemplification = Button(text='Exemplification',
+                             command=lambda: functions.feasible_objects(attributes_text, constraints_text,
+                                                                        preferences_text, preferences_type))
+    optimization = Button(text='Optimization',
+                          command=lambda: functions.feasible_objects(attributes_text, constraints_text,
+                                                                     preferences_text, preferences_type))
+    omni_optimization = Button(text='Omni-Optimization',
+                               command=lambda: functions.feasible_objects(attributes_text, constraints_text,
+                                                                          preferences_text, preferences_type))
+
+    feasible_objects.grid(column=1, row=7, pady=5, padx=5)
+    feasible_objects.config(width=15)
+    exemplification.grid(column=2, row=7, pady=5, padx=5)
+    exemplification.config(width=15)
+    optimization.grid(column=1, row=8, pady=5, padx=5)
+    optimization.config(width=15)
+    omni_optimization.grid(column=2, row=8, pady=5, padx=5)
+    omni_optimization.config(width=15)
+
+
 def create_gui():
     global root
     root = Tk()
     root.title('AI Knowledge-Based Intelligent System')
 
     create_text_inputs()
+    create_function_buttons()
 
     # keep window alive
     root.mainloop()
