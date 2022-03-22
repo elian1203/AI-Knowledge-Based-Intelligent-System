@@ -17,22 +17,6 @@ preferences_text = ""
 preferences_type = ""
 
 
-class Choices:
-
-    def __init__(self, parent, choicelist):
-        Label(parent, text="Select an item:").grid(row=0, column=0, sticky="W")
-
-        self.var = StringVar()
-        self.var.set('No data')  # default option
-        popupMenu = OptionMenu(parent, self.var, *choicelist)
-        popupMenu.grid(sticky=N + S + E + W, row=1, column=0)
-
-        Button(parent, text='Done', command=self.buttonfn).grid(row=2, column=0)
-
-    def buttonfn(self):
-        print(self.var.get())
-
-
 def set_preferences_type(type, popup):
     global preferences_type, preferences_text
     preferences_type = type
