@@ -5,6 +5,8 @@ AI Project 3
 from tkinter import *
 from tkinter import filedialog, simpledialog
 
+root = None
+
 attributes_text_view = None
 constraints_text_view = None
 preferences_text_view = None
@@ -13,6 +15,56 @@ attributes_text = ""
 constraints_text = ""
 preferences_text = ""
 preferences_type = ""
+
+
+class Choices:
+
+    def __init__(self, parent, choicelist):
+        Label(parent, text="Select an item:").grid(row=0, column=0, sticky="W")
+
+        self.var = StringVar()
+        self.var.set('No data')  # default option
+        popupMenu = OptionMenu(parent, self.var, *choicelist)
+        popupMenu.grid(sticky=N + S + E + W, row=1, column=0)
+
+        Button(parent, text='Done', command=self.buttonfn).grid(row=2, column=0)
+
+    def buttonfn(self):
+        print(self.var.get())
+
+
+def set_preferences_type(type, popup):
+    global preferences_type, preferences_text
+    preferences_type = type
+
+    if preferences_type == '':
+        return
+
+    global root
+    popup.destroy()
+    root.deiconify()
+
+
+def get_preferences_type():
+    popup = Toplevel()
+    popup.title('Preferences Type')
+
+    choice_list = ['Penalty', 'Possibilistic', 'Qualitative']
+
+    Label(popup, text="Select preference type:").grid(row=0, column=0)
+
+    type = StringVar()
+    type.set('')
+
+    menu = OptionMenu(popup, type, *choice_list)
+    menu.config(width=15)
+    menu.grid(row=1, column=0, columnspan=4)
+
+    Button(popup, text='Done', command=lambda: set_preferences_type(type.get(), popup)).grid(row=2)
+
+    global root
+    root.withdraw()
+    popup.mainloop()
 
 
 def browse_files(filetype):
@@ -40,6 +92,7 @@ def browse_files(filetype):
         preferences_text = file.read()
         preferences_text_view.delete(1.0, END)
         preferences_text_view.insert(END, preferences_text)
+        get_preferences_type()
 
     file.close()
 
@@ -66,6 +119,7 @@ def manual_entry(filetype):
         preferences_text = text
         preferences_text_view.delete(1.0, END)
         preferences_text_view.insert(END, preferences_text)
+        get_preferences_type()
 
 
 def create_text_inputs():
@@ -112,13 +166,14 @@ def create_text_inputs():
 
 
 def create_gui():
-    window = Tk()
-    window.title('AI Knowledge-Based Intelligent System')
+    global root
+    root = Tk()
+    root.title('AI Knowledge-Based Intelligent System')
 
     create_text_inputs()
 
     # keep window alive
-    window.mainloop()
+    root.mainloop()
 
 
 if __name__ == '__main__':
