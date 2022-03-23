@@ -66,35 +66,36 @@ def get_binary_attribute_from_value(attributes, value):
     raise Exception('Invalid constraint specified! Attribute not found for value ' + value)
 
 
-class HardConstraint:
+class Constraint:
     def __init__(self, line):
         self.line = line
 
     def convert_to_clasp(self, attributes):
         clasp_string = ""
-        for value in self.line.split('OR'):
-            value = value.trim()
+        for expr in self.line.split('AND'):
+            for value in expr.split('OR'):
+                value = value.trim()
 
-            negated = False
-            if value.startswith('NOT'):
-                value = value[4:]
-                negated = True
+                negated = False
+                if value.startswith('NOT'):
+                    value = value[4:]
+                    negated = True
 
-            attribute = get_binary_attribute_from_value(attributes, value)
+                attribute = get_binary_attribute_from_value(attributes, value)
 
-            if attribute.off_value:
-                negated = not negated
+                if attribute.off_value:
+                    negated = not negated
 
-            if negated:
-                clasp_string += "-"
-            clasp_string += attribute.attribute_number + " "
-        clasp_string += "0\n"
+                if negated:
+                    clasp_string += "-"
+                clasp_string += attribute.attribute_number + " "
+            clasp_string += "0\n"
 
 
 def load_hard_constraints(constraints_text):
     constraints = []
 
     for line in constraints_text.splitlines():
-        constraints.append(HardConstraint(line))
+        constraints.append(Constraint(line))
 
     return constraints
