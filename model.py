@@ -8,6 +8,9 @@ class BinaryAttribute:
         self.on_value = on_value
         self.attribute_number = attribute_number
 
+    def __str__(self):
+        return 'Attribute: %s | %s : %s | %d' % (self.name, self.off_value, self.on_value, self.attribute_number)
+
     @staticmethod
     def load_from_line(line, line_number):
         name = line.split(': ')[0]
@@ -43,8 +46,13 @@ def generate_attribute_combinations(attributes):
     combinations_list = []
     combination_number = 1
 
-    for combination in attribute_combinations:
-        combinations_list.append((combination, combination_number))
+    for c in attribute_combinations:
+        # remove combinations where the same binary attribute shows up more than once
+        if c[0][0] == c[1][0] or c[0][0] == c[2][0] or c[0][0] == c[3][0] \
+                or c[1][0] == c[2][0] or c[1][0] == c[3][0] \
+                or c[2][0] == c[3][0]:
+            continue
+        combinations_list.append((c, combination_number))
         combination_number += 1
 
     return combinations_list
@@ -55,7 +63,8 @@ def convert_attribute_to_clasp(attribute_combination):
     clasp_string = ''
     if switch == 'off':
         clasp_string += '-'
-    clasp_string += attribute.attribute_number + ' 0\n'
+    clasp_string += str(attribute.attribute_number) + ' 0\n'
+    return clasp_string
 
 
 def get_binary_attribute_from_value(attributes, value):
@@ -70,11 +79,14 @@ class Constraint:
     def __init__(self, line):
         self.line = line
 
+    def __str__(self):
+        return "Constraint: %s" % self.line
+
     def convert_to_clasp(self, attributes):
         clasp_string = ""
         for expr in self.line.split('AND'):
-            for value in expr.split('OR'):
-                value = value.trim()
+            for value in expr.strip().split('OR'):
+                value = value.strip()
 
                 negated = False
                 if value.startswith('NOT'):
@@ -83,13 +95,14 @@ class Constraint:
 
                 attribute = get_binary_attribute_from_value(attributes, value)
 
-                if attribute.off_value:
+                if attribute.off_value == value:
                     negated = not negated
 
                 if negated:
                     clasp_string += "-"
-                clasp_string += attribute.attribute_number + " "
+                clasp_string += str(attribute.attribute_number) + " "
             clasp_string += "0\n"
+        return clasp_string
 
 
 def load_hard_constraints(constraints_text):
