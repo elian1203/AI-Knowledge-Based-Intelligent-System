@@ -58,12 +58,19 @@ def generate_attribute_combinations(attributes):
     return combinations_list
 
 
-def convert_attribute_to_clasp(attribute_combination):
-    attribute, switch = attribute_combination
+def convert_attribute_to_clasp(attribute_with_value):
+    attribute, switch = attribute_with_value
     clasp_string = ''
     if switch == 'off':
         clasp_string += '-'
     clasp_string += str(attribute.attribute_number) + ' 0\n'
+    return clasp_string
+
+
+def convert_attribute_combination_to_clasp(attribute_combination):
+    clasp_string = ''
+    for attribute_with_value in attribute_combination[0]:
+        clasp_string += convert_attribute_to_clasp(attribute_with_value)
     return clasp_string
 
 
