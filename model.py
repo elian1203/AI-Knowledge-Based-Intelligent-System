@@ -25,6 +25,9 @@ class BinaryAttribute:
 def load_binary_attributes(attributes_text):
     attributes = []
 
+    if attributes_text == '':
+        return attributes
+
     line_number = 1
     for line in attributes_text.splitlines():
         attributes.append(BinaryAttribute.load_from_line(line, line_number))
@@ -74,6 +77,22 @@ def convert_attribute_combination_to_clasp(attribute_combination):
     return clasp_string
 
 
+def convert_attribute_to_value(attribute_with_value):
+    attribute, switch = attribute_with_value
+    if switch == 'off':
+        return attribute.off_value
+    else:
+        return attribute.on_value
+
+
+def convert_attribute_combination_to_values(attribute_combination):
+    values = []
+    # sort in order of attribute number so that it shows up in the same order as entered
+    for c in sorted(attribute_combination[0], key=lambda e: e[0].attribute_number):
+        values.append(convert_attribute_to_value(c))
+    return values
+
+
 def get_binary_attribute_from_value(attributes, value):
     for attribute in attributes:
         if attribute.off_value == value or attribute.on_value == value:
@@ -114,6 +133,9 @@ class Constraint:
 
 def load_hard_constraints(constraints_text):
     constraints = []
+
+    if constraints_text == '':
+        return constraints
 
     for line in constraints_text.splitlines():
         constraints.append(Constraint(line))

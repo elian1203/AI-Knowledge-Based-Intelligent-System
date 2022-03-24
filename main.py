@@ -156,14 +156,14 @@ def create_function_buttons():
                               command=lambda: functions.feasible_objects(attributes_text, constraints_text,
                                                                          preferences_text, preferences_type))
     exemplification = Button(text='Exemplification',
-                             command=lambda: functions.feasible_objects(attributes_text, constraints_text,
-                                                                        preferences_text, preferences_type))
+                             command=lambda: functions.exemplification(attributes_text, constraints_text,
+                                                                       preferences_text, preferences_type))
     optimization = Button(text='Optimization',
-                          command=lambda: functions.feasible_objects(attributes_text, constraints_text,
-                                                                     preferences_text, preferences_type))
+                          command=lambda: functions.optimization(attributes_text, constraints_text,
+                                                                 preferences_text, preferences_type))
     omni_optimization = Button(text='Omni-Optimization',
-                               command=lambda: functions.feasible_objects(attributes_text, constraints_text,
-                                                                          preferences_text, preferences_type))
+                               command=lambda: functions.omni_optimization(attributes_text, constraints_text,
+                                                                           preferences_text, preferences_type))
 
     feasible_objects.grid(column=1, row=7, pady=5, padx=5)
     feasible_objects.config(width=15)

@@ -10,9 +10,11 @@ def clasp(program_input):
     run = subprocess.run(['clasp'], input=program_input.encode(), stdout=subprocess.PIPE)
 
     for line in run.stdout.splitlines():
-        if line.startswith('s SATISFIABLE'):
+        if line.startswith(b's SATISFIABLE'):
             return True
-        elif line.startswith('s UNSATISFIABLE'):
+        elif line.startswith(b's UNSATISFIABLE'):
             return False
 
+    print(program_input)
+    print(run.stdout)
     raise Exception('Missing clasp file! Unable to process constraints.')
