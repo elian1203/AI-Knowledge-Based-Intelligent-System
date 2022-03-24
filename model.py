@@ -30,6 +30,8 @@ def load_binary_attributes(attributes_text):
 
     line_number = 1
     for line in attributes_text.splitlines():
+        if line == '':
+            continue
         attributes.append(BinaryAttribute.load_from_line(line, line_number))
         line_number += 1
 
@@ -138,6 +140,8 @@ def load_hard_constraints(constraints_text):
         return constraints
 
     for line in constraints_text.splitlines():
+        if line == '':
+            continue
         constraints.append(Constraint(line))
 
     return constraints
