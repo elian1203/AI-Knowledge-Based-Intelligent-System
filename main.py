@@ -55,7 +55,7 @@ def get_preferences_type():
 
 def browse_files(filetype):
     filename = filedialog.askopenfile(title="Select %s file" % filetype, filetypes=(("Text files",
-                                                                                     "*.txt*"),
+                                                                                     "*.txt"),
                                                                                     ("All files",
                                                                                      "*.*")))
     if filename is None:

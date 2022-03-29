@@ -1,3 +1,4 @@
+from random import randint
 from tkinter import *
 import model
 import clasp_wrapper
@@ -45,25 +46,121 @@ def feasible_objects(attributes_text, constraints_text, preferences_text, prefer
     # view.grid(row=2, column=1)
     window.mainloop()
 
+def calculate_prefrences(attributes, attribute_combinations, preferences_text, preferences_type):
+    if preferences_type == 'Penalty':
+        penalties = {}
+
+        for preference in preferences_text.splitlines():
+            constraint = preference.split(', ')[0]
+            penalty = preference.split(', ')[1]
+            constraint = model.Constraint(constraint)
+            for attribute_combination in attribute_combinations:
+                clasp = convert_combination_and_constraints_to_clasp(attribute_combination, attributes, [constraint])
+                satisfied = clasp_wrapper.clasp(clasp)
+                if not satisfied: 
+                    current_value = float(penalty)
+                    if attribute_combination in penalties.keys():
+                        current_value += penalties[attribute_combination]
+                    penalties[attribute_combination] = current_value
+        return penalties
+
+    elif preferences_type == 'Possiblistic':
+        penalties = {}
+
+        for preference in preferences_text.splitlines():
+            constraint = preference.split(', ')[0]
+            penalty = preference.split(', ')[1]
+            constraint = model.Constraint(constraint)
+            for attribute_combination in attribute_combinations:
+                clasp = convert_combination_and_constraints_to_clasp(attribute_combination, attributes, [constraint])
+                satisfied = clasp_wrapper.clasp(clasp)
+                current = 1
+                if not satisfied:
+                    current = 1-float(penalty)
+                if penalties[attribute_combination] > current:
+                    penalties[attribute_combination] = current
+        return penalties
+
+    else:
+        pass
+
+
 
 def exemplification(attributes_text, constraints_text, preferences_text, preferences_type):
     attributes = model.load_binary_attributes(attributes_text)
-    # test attributes to make sure they are loading and converting to clasp correctly
-    for a in attributes:
-        print(a)
-        print(model.convert_attribute_to_clasp((a, 'off')), end='')
-        print(model.convert_attribute_to_clasp((a, 'on')), end='')
-    hard_constraints = model.load_hard_constraints(constraints_text)
-    # test constraints to make sure they are loading and converting to clasp correctly
-    for c in hard_constraints:
-        print(c)
-        print(c.convert_to_clasp(attributes), end='')
-
     attribute_combinations = model.generate_attribute_combinations(attributes)
-    # test combinations to make sure they are correct
-    for combination in attribute_combinations:
-        print(combination)
-        print(model.convert_attribute_combination_to_clasp(combination), end='')
+    hard_constraints = model.load_hard_constraints(constraints_text)
+
+    attribute_combinations = [c for c in attribute_combinations
+                              if clasp_wrapper.clasp(
+            convert_combination_and_constraints_to_clasp(c, attributes, hard_constraints))]
+    preferences = calculate_prefrences(attributes, attribute_combinations, preferences_text, preferences_type)
+                
+    
+    n1 = randint(0,len(attribute_combinations)-1)
+    n2 = randint(0,len(attribute_combinations)-1)
+    c1 = attribute_combinations[n1]
+    c2 = attribute_combinations[n2]
+    p1 = preferences[c1]
+    p2 = preferences[c2]
+    if preferences_type == 'Penalty':
+        p1text=p1
+        p2text=p2
+    
+        if p1 > p2:
+            outcometext='The second object is better'
+        elif p1 < p2:
+            outcometext='The first object is better'
+        else:
+            outcometext = 'The objects are equal'
+
+    elif preferences_type == 'Possiblistic':
+        p1text=p1
+        p2text=p2
+        
+        if p1 < p2:
+            outcometext='The second object is better'
+        elif p1 > p2:
+            outcometext='The first object is better'
+        else:
+            outcometext = 'The objects are equal'
+
+            
+    window = Toplevel()
+    window.title('Exemplification Objects')
+    title = Label(window, text='Exemplification Objects')
+    title.grid(row=1, column=1, columnspan=len(attributes)+1)
+
+    column = 1
+    for value in model.convert_attribute_combination_to_values(c1):
+        label = Label(window, text=value, padx=10)
+        label.grid(row=2, column=column)
+        column += 1
+    label = Label(window,text = p1text, padx=10)
+    label.grid(row=2, column=column)
+
+    column = 1
+    for value in model.convert_attribute_combination_to_values(c2):
+        label = Label(window, text=value, padx=10)
+        label.grid(row=3, column=column)
+        column += 1
+    label = Label(window,text = p2text, padx=10)
+    label.grid(row=3, column=column)
+
+    outcome = Label(window, text = outcometext)
+    outcome.grid(row=4, column=1, columnspan=len(attributes)+1)
+
+
+
+
+
+    
+
+
+                
+
+
+            
 
 
 def optimization(attributes_text, constraints_text, preferences_text, preferences_type):
