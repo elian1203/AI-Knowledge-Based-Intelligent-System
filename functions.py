@@ -181,22 +181,42 @@ def exemplification(attributes_text, constraints_text, preferences_text, prefere
     elif preferences_type == 'Possibilistic':
         label = Label(window, text='TD', padx=10)
         label.grid(row=2, column=column)
+    else:
+        for preference in preferences_text.splitlines():
+            label = Label(window, text = preference, padx=10)
+            label.grid(row=2, column=column)  
+            column += 1
 
     column = 1
     for value in model.convert_attribute_combination_to_values(c1):
         label = Label(window, text=value, padx=10)
         label.grid(row=3, column=column)
         column += 1
-    label = Label(window, text=p1text, padx=10)
-    label.grid(row=3, column=column)
+
+    if preferences_type == 'Qualitative':
+        for preference in preferences_text.splitlines():
+            label = Label(window, text = preferences[(c1, preference)], padx=10)
+            label.grid(row=3, column=column)
+            column += 1
+    else:
+        label = Label(window, text=p1text, padx=10)
+        label.grid(row=3, column=column)
 
     column = 1
     for value in model.convert_attribute_combination_to_values(c2):
         label = Label(window, text=value, padx=10)
         label.grid(row=4, column=column)
         column += 1
-    label = Label(window, text=p2text, padx=10)
-    label.grid(row=4, column=column)
+
+    if preferences_type == 'Qualitative':
+        for preference in preferences_text.splitlines():
+            label = Label(window, text = preferences[(c2, preference)], padx=10)
+            label.grid(row=4, column=column)
+            column += 1
+
+    else:
+        label = Label(window, text=p2text, padx=10)
+        label.grid(row=4, column=column)
 
     outcome = Label(window, text=outcometext)
     outcome.grid(row=5, column=1, columnspan=len(attributes) + 1)
