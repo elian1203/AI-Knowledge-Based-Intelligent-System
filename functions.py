@@ -126,9 +126,9 @@ def exemplification(attributes_text, constraints_text, preferences_text, prefere
         p1text = 1
         p2text = 1
         if c1 in preferences:
-            p1text = preferences[c1]
+            p1text = '%.1f' % preferences[c1]
         if c2 in preferences:
-            p2text = preferences[c2]
+            p2text = '%.1f' % preferences[c2]
 
         if p1text < p2text:
             outcometext = 'The second object is better'
