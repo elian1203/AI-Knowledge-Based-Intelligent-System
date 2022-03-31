@@ -1,10 +1,12 @@
 from random import randint
 from tkinter import *
+from xml.sax import parseString
 import model
 import clasp_wrapper
 
 
 def convert_combination_and_constraints_to_clasp(attribute_combination, attributes, constraints):
+    print(constraints[0])
     clasp_string = 'p cnf %d %d\n' % (len(attribute_combination[0]), len(attribute_combination[0]) + len(constraints))
     clasp_string += model.convert_attribute_combination_to_clasp(attribute_combination)
     for constraint in constraints:
@@ -92,7 +94,33 @@ def calculate_prefrences(attributes, attribute_combinations, preferences_text, p
         return penalties
 
     else:
-        pass
+        qualitative = {}
+        for preference in preferences_text.splitlines():
+            constraints = preference.split('IF')[0].strip()
+            entry_constraint = preference.split('IF')[1].strip()
+            entry_constraint = model.Constraint(entry_constraint)
+            for attribute_combination in attribute_combinations:
+                if entry_constraint != '':
+                    print(entry_constraint)
+                    clasp = convert_combination_and_constraints_to_clasp(attribute_combination, attributes, [entry_constraint])
+                    satisfied = clasp_wrapper.clasp(clasp)
+                else:
+                    satisfied = True
+                if satisfied:
+                    order = 1
+                    for constraint in constraints.split('BT'):
+                        constraint = model.Constraint(constraint.strip())
+                        clasp = convert_combination_and_constraints_to_clasp(attribute_combination, attributes, [constraint])
+                        satisfied = clasp_wrapper.clasp(clasp)
+                        if satisfied:
+                            qualitative[(attribute_combination, preference)] = order 
+                            break
+                        else:
+                            order += 1
+                            qualitative[(attribute_combination, preference)] = 'INF'
+                else:
+                    qualitative[(attribute_combination, preference)] = 'INF'
+        return qualitative
 
 
 def exemplification(attributes_text, constraints_text, preferences_text, preferences_type):
