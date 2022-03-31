@@ -6,7 +6,6 @@ import clasp_wrapper
 
 
 def convert_combination_and_constraints_to_clasp(attribute_combination, attributes, constraints):
-    print(constraints[0])
     clasp_string = 'p cnf %d %d\n' % (len(attribute_combination[0]), len(attribute_combination[0]) + len(constraints))
     clasp_string += model.convert_attribute_combination_to_clasp(attribute_combination)
     for constraint in constraints:
@@ -100,8 +99,7 @@ def calculate_prefrences(attributes, attribute_combinations, preferences_text, p
             entry_constraint = preference.split('IF')[1].strip()
             entry_constraint = model.Constraint(entry_constraint)
             for attribute_combination in attribute_combinations:
-                if entry_constraint != '':
-                    print(entry_constraint)
+                if entry_constraint.line != '':
                     clasp = convert_combination_and_constraints_to_clasp(attribute_combination, attributes, [entry_constraint])
                     satisfied = clasp_wrapper.clasp(clasp)
                 else:
