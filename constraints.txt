@@ -1,2 +1,6 @@
-NOT soup OR NOT ice-cream
-NOT beef OR salad
+NOT corona OR NOT red
+NOT peach OR citrus
+aged OR NOT chocolate
+vanilla OR appletini
+NOT spicy OR modelo
+cachaca OR mint

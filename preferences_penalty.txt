@@ -1,3 +1,6 @@
-fish AND wine, 10
-wine OR cake, 6
-beer AND beer OR beef AND NOT soup, 7
+corona AND red, 20
+peach AND vanilla, 10
+spicy OR chocolate, 5
+aged OR absolut, 2
+white AND modelo, 7
+mint OR watermelon AND svedka, 3

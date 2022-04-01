@@ -1,3 +1,6 @@
-fish AND wine, 0.8
-wine OR cake, 0.5
-beer AND beer OR beef AND NOT soup, 0.6
+corona AND red, 0.20
+peach AND vanilla, 0.10
+spicy OR chocolate, 0.5
+aged OR absolut, 0.2
+white AND modelo, 0.7
+mint OR watermelon AND svedka, 0.3

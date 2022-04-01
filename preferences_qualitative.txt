@@ -1,4 +1,6 @@
-fish BT beef IF
-wine BT beer IF fish
-beef AND beer BT fish AND beer BT beef AND wine IF
-cake BT ice-cream IF soup
+peach BT modelo IF
+red BT vanilla IF corona
+spicy AND white BT chocolate AND mint BT aged AND vanilla IF
+corona BT red IF vanilla
+modelo BT white IF
+mint BT red IF vanilla

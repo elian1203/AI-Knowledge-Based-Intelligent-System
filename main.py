@@ -13,17 +13,10 @@ attributes_text_view = None
 constraints_text_view = None
 preferences_text_view = None
 
-attributes_text = """appetizer: soup, salad
-entree: beef, fish
-drink: beer, wine
-dissert: cake, ice-cream"""
-constraints_text = """NOT soup OR NOT ice-cream
-NOT beef OR salad"""
-preferences_text = """fish BT beef IF
-wine BT beer IF fish
-beef AND beer BT fish AND beer BT beef AND wine IF
-cake BT ice-cream IF soup"""
-preferences_type = "Qualitative"
+attributes_text = ""
+constraints_text = ""
+preferences_text = ""
+preferences_type = ""
 
 
 def set_preferences_type(type, popup):

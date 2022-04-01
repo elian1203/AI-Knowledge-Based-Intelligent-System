@@ -1,4 +1,8 @@
-appetizer: soup, salad
-entree: beef, fish
-drink: beer, wine
-dissert: cake, ice-cream
+beer: corona, modelo
+wine: red, white
+margarita: peach, watermelon
+mojito: citrus, mint
+vodka: absolut, svedka
+rum: cachaca, aged
+martini: chocolate, appletini
+whiskey: vanilla, spicy
