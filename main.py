@@ -25,6 +25,7 @@ def set_preferences_type(type, popup):
 
     if preferences_type == '':
         return
+    functions.load_all(attributes_text, constraints_text, preferences_text, preferences_type)
 
     global root
     popup.destroy()
@@ -54,6 +55,7 @@ def get_preferences_type():
 
 
 def browse_files(filetype):
+    global attributes_text, constraints_text, preferences_text
     filename = filedialog.askopenfile(title="Select %s file" % filetype, filetypes=(("Text files",
                                                                                      "*.txt"),
                                                                                     ("All files",
@@ -64,18 +66,18 @@ def browse_files(filetype):
     file = open(filename.name)
 
     if filetype == 'attributes':
-        global attributes_text
         attributes_text = file.read()
+        functions.load_all(attributes_text, constraints_text, preferences_text, preferences_type)
         attributes_text_view.delete(1.0, END)
         attributes_text_view.insert(END, attributes_text)
     elif filetype == 'constraints':
-        global constraints_text
         constraints_text = file.read()
+        functions.load_all(attributes_text, constraints_text, preferences_text, preferences_type)
         constraints_text_view.delete(1.0, END)
         constraints_text_view.insert(END, constraints_text)
     elif filetype == 'preferences':
-        global preferences_text
         preferences_text = file.read()
+        # functions.load_all(attributes_text, constraints_text, preferences_text, preferences_type)
         preferences_text_view.delete(1.0, END)
         preferences_text_view.insert(END, preferences_text)
         get_preferences_type()
@@ -84,6 +86,7 @@ def browse_files(filetype):
 
 
 def manual_entry(filetype):
+    global attributes_text, attributes_text_view, constraints_text, constraints_text_view, preferences_text, preferences_text_view
     text = simpledialog.askstring(title="Manually enter %s" % filetype,
                                   prompt="Please paste or type the %s text." % filetype)
 
@@ -91,18 +94,18 @@ def manual_entry(filetype):
         return
 
     if filetype == 'attributes':
-        global attributes_text, attributes_text_view
         attributes_text = text
+        functions.load_all(attributes_text, constraints_text, preferences_text, preferences_type)
         attributes_text_view.delete(1.0, END)
         attributes_text_view.insert(END, attributes_text)
     elif filetype == 'constraints':
-        global constraints_text
         constraints_text = text
+        functions.load_all(attributes_text, constraints_text, preferences_text, preferences_type)
         constraints_text_view.delete(1.0, END)
         constraints_text_view.insert(END, constraints_text)
     elif filetype == 'preferences':
-        global preferences_text
         preferences_text = text
+        # functions.load_all(attributes_text, constraints_text, preferences_text, preferences_type)
         preferences_text_view.delete(1.0, END)
         preferences_text_view.insert(END, preferences_text)
         get_preferences_type()

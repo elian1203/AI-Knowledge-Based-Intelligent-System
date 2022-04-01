@@ -4,6 +4,11 @@ from tkinter import *
 import clasp_wrapper
 import model
 
+attributes = None
+attribute_combinations = None
+hard_constraints = None
+preferences = None
+
 
 def convert_combination_and_constraints_to_clasp(attribute_combination, attributes, constraints):
     clasp_string = 'p cnf %d %d\n' % (len(attribute_combination[0]), len(attribute_combination[0]) + len(constraints))
@@ -13,16 +18,24 @@ def convert_combination_and_constraints_to_clasp(attribute_combination, attribut
     return clasp_string
 
 
+def load_all(attributes_text, constraints_text, preferences_text, preferences_type):
+    global attributes, attribute_combinations, hard_constraints, preferences
+    attributes = model.load_binary_attributes(attributes_text)
+    attribute_combinations = model.generate_attribute_combinations(attributes)
+    if constraints_text != '':
+        hard_constraints = model.load_hard_constraints(constraints_text)
+
+        attribute_combinations = [c for c in attribute_combinations
+                                  if clasp_wrapper.clasp(
+                convert_combination_and_constraints_to_clasp(c, attributes, hard_constraints))]
+        if preferences_text != '':
+            preferences = calculate_preferences(attributes, attribute_combinations, preferences_text, preferences_type)
+
+
 # the plan here will be to open another window with Toplevel() and provide the appropriate output after parsing the text
 # the text for all of these will be parsed on-the-fly when each function is called
 def feasible_objects(attributes_text, constraints_text, preferences_text, preferences_type):
-    attributes = model.load_binary_attributes(attributes_text)
-    attribute_combinations = model.generate_attribute_combinations(attributes)
-    hard_constraints = model.load_hard_constraints(constraints_text)
-
-    attribute_combinations = [c for c in attribute_combinations
-                              if clasp_wrapper.clasp(
-            convert_combination_and_constraints_to_clasp(c, attributes, hard_constraints))]
+    global attributes, attribute_combinations, hard_constraints, preferences
 
     window = Toplevel()
     window.title('Feasible Objects')
@@ -134,14 +147,7 @@ def calculate_preferences(attributes, attribute_combinations, preferences_text, 
 
 
 def exemplification(attributes_text, constraints_text, preferences_text, preferences_type):
-    attributes = model.load_binary_attributes(attributes_text)
-    attribute_combinations = model.generate_attribute_combinations(attributes)
-    hard_constraints = model.load_hard_constraints(constraints_text)
-
-    attribute_combinations = [c for c in attribute_combinations
-                              if clasp_wrapper.clasp(
-            convert_combination_and_constraints_to_clasp(c, attributes, hard_constraints))]
-    preferences = calculate_preferences(attributes, attribute_combinations, preferences_text, preferences_type)
+    global attributes, attribute_combinations, hard_constraints, preferences
     preferences_amount = len(preferences_text.splitlines())
 
     n1 = randint(0, len(attribute_combinations) - 1)
@@ -286,14 +292,7 @@ def compare_qualitative(c1, p1, c2, p2):
 
 
 def optimization(attributes_text, constraints_text, preferences_text, preferences_type):
-    attributes = model.load_binary_attributes(attributes_text)
-    attribute_combinations = model.generate_attribute_combinations(attributes)
-    hard_constraints = model.load_hard_constraints(constraints_text)
-
-    attribute_combinations = [c for c in attribute_combinations
-                              if clasp_wrapper.clasp(
-            convert_combination_and_constraints_to_clasp(c, attributes, hard_constraints))]
-    preferences = calculate_preferences(attributes, attribute_combinations, preferences_text, preferences_type)
+    global attributes, attribute_combinations, hard_constraints, preferences
     preferences_amount = len(preferences_text.splitlines())
 
     if preferences_type == 'Penalty':
@@ -374,14 +373,7 @@ def optimization(attributes_text, constraints_text, preferences_text, preference
 
 
 def omni_optimization(attributes_text, constraints_text, preferences_text, preferences_type):
-    attributes = model.load_binary_attributes(attributes_text)
-    attribute_combinations = model.generate_attribute_combinations(attributes)
-    hard_constraints = model.load_hard_constraints(constraints_text)
-
-    attribute_combinations = [c for c in attribute_combinations
-                              if clasp_wrapper.clasp(
-            convert_combination_and_constraints_to_clasp(c, attributes, hard_constraints))]
-    preferences = calculate_preferences(attributes, attribute_combinations, preferences_text, preferences_type)
+    global attributes, attribute_combinations, hard_constraints, preferences
     preferences_amount = len(preferences_text.splitlines())
     list = []
     if preferences_type == 'Penalty':
