@@ -1,4 +1,5 @@
 from itertools import combinations
+from math import comb
 from random import randint
 from tkinter import *
 from xml.sax import parseString
@@ -223,6 +224,47 @@ def exemplification(attributes_text, constraints_text, preferences_text, prefere
     outcome.grid(row=5, column=1, columnspan=len(attributes) + 1)
 
 
+def compare_qualitative(c1, p1, c2, p2):
+    better = None
+    
+    for i in range(len(p1)):
+        print('for')
+        preference1, value1 = p1[i]
+        preference2, value2 = p2[i]
+        print(value1)
+        print(value2)
+
+        if value1 == 'INF' and value2 != 'INF':
+            if better == p1:
+                print('nc')
+                return 'nc'
+            better = p2
+        elif value1 != 'INF' and value2 == 'INF':
+            if better == p2:
+                print('nc')
+                return 'nc'
+            better = p1
+        elif value1 > value2:
+            if better == p1:
+                print('nc')
+                return 'nc'
+            better = p2
+        elif value1 < value2:
+            if better == p2:
+                print('nc')
+                return 'nc'
+            better = p1
+    if better == p1:
+        print('better')
+        return 'better'
+    elif better == p2:
+        print('worse')
+        return 'worse'
+    else:
+        print('equal')
+        return 'equal'
+
+
 def optimization(attributes_text, constraints_text, preferences_text, preferences_type):
     attributes = model.load_binary_attributes(attributes_text)
     attribute_combinations = model.generate_attribute_combinations(attributes)
@@ -251,7 +293,25 @@ def optimization(attributes_text, constraints_text, preferences_text, preference
                 c = combination
         
     else:
-        pass
+        d = {}
+        for combination, preference in preferences:
+            value = preferences[(combination, preference)]
+            if combination in d:
+                list = d[combination]
+                list.append((preference, value))
+            else:
+                list = [(preference, value)]
+            d[combination] = list
+        best = None
+        for c1 in d:
+            if best is None:
+                best = c1
+            else:
+                result = compare_qualitative(c1, d[c1], best, d[best])
+                if result == 'better':
+                    best = c1
+        c = best
+
 
     window = Toplevel()
     window.title('Optimization Objects')
@@ -327,7 +387,41 @@ def omni_optimization(attributes_text, constraints_text, preferences_text, prefe
                 list.append(combination)
         
     else:
-        pass
+        d = {}
+        for combination, preference in preferences:
+            value = preferences[(combination, preference)]
+            if combination in d:
+                list = d[combination]
+                list.append((preference, value))
+            else:
+                list = [(preference, value)]
+            d[combination] = list
+        best = None
+        list = []
+        for c in d:
+            list.append(c)
+        for c1 in list:
+            for c2 in list:
+                if c1 == c2:
+                    continue
+                result = compare_qualitative(c1, d[c1], c2, d[c2])
+                if result == 'better':
+                    list.remove(c2)
+        # for c1 in d:
+        #     if len(list) == 0:
+        #         list.append(c1)
+        #     else:
+        #         for compare in list:
+        #             result = compare_qualitative(c1, d[c1], compare, d[compare])
+        #             if result == 'better':
+        #                 list.remove(compare)
+        #                 list.append(c1)
+        #             elif result == 'equal' or result == 'nc':
+        #                 if c1 == compare:
+        #                     continue
+        #                 if result == 'nc':
+        #                     print('nc')
+        #                 list.append(c1)
     
     window = Toplevel()
     window.title('Omni-Optimization Objects')
@@ -351,7 +445,7 @@ def omni_optimization(attributes_text, constraints_text, preferences_text, prefe
             label = Label(window, text = preference, padx=10)
             label.grid(row=2, column=column)  
             column += 1
-            
+
     row = 3
     for c in list:
         column = 1
