@@ -1,10 +1,8 @@
-from itertools import combinations
-from math import comb
 from random import randint
 from tkinter import *
-from xml.sax import parseString
-import model
+
 import clasp_wrapper
+import model
 
 
 def convert_combination_and_constraints_to_clasp(attribute_combination, attributes, constraints):
@@ -102,7 +100,8 @@ def calculate_preferences(attributes, attribute_combinations, preferences_text, 
             entry_constraint = model.Constraint(entry_constraint)
             for attribute_combination in attribute_combinations:
                 if entry_constraint.line != '':
-                    clasp = convert_combination_and_constraints_to_clasp(attribute_combination, attributes, [entry_constraint])
+                    clasp = convert_combination_and_constraints_to_clasp(attribute_combination, attributes,
+                                                                         [entry_constraint])
                     satisfied = clasp_wrapper.clasp(clasp)
                 else:
                     satisfied = True
@@ -110,10 +109,11 @@ def calculate_preferences(attributes, attribute_combinations, preferences_text, 
                     order = 1
                     for constraint in constraints.split('BT'):
                         constraint = model.Constraint(constraint.strip())
-                        clasp = convert_combination_and_constraints_to_clasp(attribute_combination, attributes, [constraint])
+                        clasp = convert_combination_and_constraints_to_clasp(attribute_combination, attributes,
+                                                                             [constraint])
                         satisfied = clasp_wrapper.clasp(clasp)
                         if satisfied:
-                            qualitative[(attribute_combination, preference)] = order 
+                            qualitative[(attribute_combination, preference)] = order
                             break
                         else:
                             order += 1
@@ -132,6 +132,7 @@ def exemplification(attributes_text, constraints_text, preferences_text, prefere
                               if clasp_wrapper.clasp(
             convert_combination_and_constraints_to_clasp(c, attributes, hard_constraints))]
     preferences = calculate_preferences(attributes, attribute_combinations, preferences_text, preferences_type)
+    preferences_amount = len(preferences_text.splitlines())
 
     n1 = randint(0, len(attribute_combinations) - 1)
     n2 = randint(0, len(attribute_combinations) - 1)
@@ -164,11 +165,31 @@ def exemplification(attributes_text, constraints_text, preferences_text, prefere
             outcometext = 'The first object is better'
         else:
             outcometext = 'The objects are equal'
+    else:
+        d = {}
+        for combination, preference in preferences:
+            value = preferences[(combination, preference)]
+            if combination in d:
+                list = d[combination]
+                list.append((preference, value))
+            else:
+                list = [(preference, value)]
+            d[combination] = list
+        result = compare_qualitative(c1, d[c1], c2, d[c2])
+        if result == 'better':
+            outcometext = 'The first object is better'
+        elif result == 'worse':
+            outcometext = 'The second object is better'
+        elif result == 'equal':
+            outcometext = 'The objects are equal'
+        else:
+            outcometext = 'The objects are not comparable'
+
 
     window = Toplevel()
     window.title('Exemplification Objects')
     title = Label(window, text='Exemplification Objects')
-    title.grid(row=1, column=1, columnspan=len(attributes) + 1)
+    title.grid(row=1, column=1, columnspan=len(attributes) + preferences_amount)
 
     column = 1
     for a in attributes:
@@ -185,8 +206,8 @@ def exemplification(attributes_text, constraints_text, preferences_text, prefere
         label.grid(row=2, column=column)
     else:
         for preference in preferences_text.splitlines():
-            label = Label(window, text = preference, padx=10)
-            label.grid(row=2, column=column)  
+            label = Label(window, text=preference, padx=10)
+            label.grid(row=2, column=column)
             column += 1
 
     column = 1
@@ -197,7 +218,7 @@ def exemplification(attributes_text, constraints_text, preferences_text, prefere
 
     if preferences_type == 'Qualitative':
         for preference in preferences_text.splitlines():
-            label = Label(window, text = preferences[(c1, preference)], padx=10)
+            label = Label(window, text=preferences[(c1, preference)], padx=10)
             label.grid(row=3, column=column)
             column += 1
     else:
@@ -212,7 +233,7 @@ def exemplification(attributes_text, constraints_text, preferences_text, prefere
 
     if preferences_type == 'Qualitative':
         for preference in preferences_text.splitlines():
-            label = Label(window, text = preferences[(c2, preference)], padx=10)
+            label = Label(window, text=preferences[(c2, preference)], padx=10)
             label.grid(row=4, column=column)
             column += 1
 
@@ -221,47 +242,37 @@ def exemplification(attributes_text, constraints_text, preferences_text, prefere
         label.grid(row=4, column=column)
 
     outcome = Label(window, text=outcometext)
-    outcome.grid(row=5, column=1, columnspan=len(attributes) + 1)
+    outcome.grid(row=5, column=1, columnspan=len(attributes) + preferences_amount)
 
 
 def compare_qualitative(c1, p1, c2, p2):
     better = None
-    
+
     for i in range(len(p1)):
-        print('for')
         preference1, value1 = p1[i]
         preference2, value2 = p2[i]
-        print(value1)
-        print(value2)
 
         if value1 == 'INF' and value2 != 'INF':
             if better == p1:
-                print('nc')
                 return 'nc'
             better = p2
         elif value1 != 'INF' and value2 == 'INF':
             if better == p2:
-                print('nc')
                 return 'nc'
             better = p1
         elif value1 > value2:
             if better == p1:
-                print('nc')
                 return 'nc'
             better = p2
         elif value1 < value2:
             if better == p2:
-                print('nc')
                 return 'nc'
             better = p1
     if better == p1:
-        print('better')
         return 'better'
     elif better == p2:
-        print('worse')
         return 'worse'
     else:
-        print('equal')
         return 'equal'
 
 
@@ -274,6 +285,8 @@ def optimization(attributes_text, constraints_text, preferences_text, preference
                               if clasp_wrapper.clasp(
             convert_combination_and_constraints_to_clasp(c, attributes, hard_constraints))]
     preferences = calculate_preferences(attributes, attribute_combinations, preferences_text, preferences_type)
+    preferences_amount = len(preferences_text.splitlines())
+
     if preferences_type == 'Penalty':
         min = 1000000
         for combination in preferences:
@@ -282,7 +295,7 @@ def optimization(attributes_text, constraints_text, preferences_text, preference
                 min = penalty
                 p1text = penalty
                 c = combination
-        
+
     elif preferences_type == 'Possibilistic':
         max = -1
         for combination in preferences:
@@ -291,7 +304,7 @@ def optimization(attributes_text, constraints_text, preferences_text, preference
                 max = penalty
                 p1text = penalty
                 c = combination
-        
+
     else:
         d = {}
         for combination, preference in preferences:
@@ -312,11 +325,10 @@ def optimization(attributes_text, constraints_text, preferences_text, preference
                     best = c1
         c = best
 
-
     window = Toplevel()
     window.title('Optimization Objects')
     title = Label(window, text='Optimization Objects')
-    title.grid(row=1, column=1, columnspan=len(attributes)+1)
+    title.grid(row=1, column=1, columnspan=len(attributes) + preferences_amount)
 
     column = 1
     for a in attributes:
@@ -332,8 +344,8 @@ def optimization(attributes_text, constraints_text, preferences_text, preference
         label.grid(row=2, column=column)
     else:
         for preference in preferences_text.splitlines():
-            label = Label(window, text = preference, padx=10)
-            label.grid(row=2, column=column)  
+            label = Label(window, text=preference, padx=10)
+            label.grid(row=2, column=column)
             column += 1
 
     column = 1
@@ -344,13 +356,13 @@ def optimization(attributes_text, constraints_text, preferences_text, preference
 
     if preferences_type == 'Qualitative':
         for preference in preferences_text.splitlines():
-            label = Label(window, text = preferences[(c, preference)], padx=10)
+            label = Label(window, text=preferences[(c, preference)], padx=10)
             label.grid(row=3, column=column)
             column += 1
     else:
         label = Label(window, text=p1text, padx=10)
         label.grid(row=3, column=column)
-    
+
 
 def omni_optimization(attributes_text, constraints_text, preferences_text, preferences_type):
     attributes = model.load_binary_attributes(attributes_text)
@@ -361,6 +373,7 @@ def omni_optimization(attributes_text, constraints_text, preferences_text, prefe
                               if clasp_wrapper.clasp(
             convert_combination_and_constraints_to_clasp(c, attributes, hard_constraints))]
     preferences = calculate_preferences(attributes, attribute_combinations, preferences_text, preferences_type)
+    preferences_amount = len(preferences_text.splitlines())
     list = []
     if preferences_type == 'Penalty':
         min = 1000000
@@ -373,7 +386,7 @@ def omni_optimization(attributes_text, constraints_text, preferences_text, prefe
                 p1text = penalty
             elif penalty == min:
                 list.append(combination)
-        
+
     elif preferences_type == 'Possibilistic':
         max = -1
         for combination in preferences:
@@ -385,7 +398,7 @@ def omni_optimization(attributes_text, constraints_text, preferences_text, prefe
                 p1text = penalty
             elif penalty == max:
                 list.append(combination)
-        
+
     else:
         d = {}
         for combination, preference in preferences:
@@ -407,26 +420,13 @@ def omni_optimization(attributes_text, constraints_text, preferences_text, prefe
                 result = compare_qualitative(c1, d[c1], c2, d[c2])
                 if result == 'better':
                     list.remove(c2)
-        # for c1 in d:
-        #     if len(list) == 0:
-        #         list.append(c1)
-        #     else:
-        #         for compare in list:
-        #             result = compare_qualitative(c1, d[c1], compare, d[compare])
-        #             if result == 'better':
-        #                 list.remove(compare)
-        #                 list.append(c1)
-        #             elif result == 'equal' or result == 'nc':
-        #                 if c1 == compare:
-        #                     continue
-        #                 if result == 'nc':
-        #                     print('nc')
-        #                 list.append(c1)
-    
+                elif result == 'worse':
+                    list.remove(c1)
+                    break
     window = Toplevel()
     window.title('Omni-Optimization Objects')
     title = Label(window, text='Omni-Optimization Objects')
-    title.grid(row=1, column=1, columnspan=len(attributes)+1)
+    title.grid(row=1, column=1, columnspan=len(attributes) + preferences_amount)
 
     column = 1
     for a in attributes:
@@ -442,8 +442,8 @@ def omni_optimization(attributes_text, constraints_text, preferences_text, prefe
         label.grid(row=2, column=column)
     else:
         for preference in preferences_text.splitlines():
-            label = Label(window, text = preference, padx=10)
-            label.grid(row=2, column=column)  
+            label = Label(window, text=preference, padx=10)
+            label.grid(row=2, column=column)
             column += 1
 
     row = 3
@@ -455,10 +455,10 @@ def omni_optimization(attributes_text, constraints_text, preferences_text, prefe
             column += 1
         if preferences_type == 'Qualitative':
             for preference in preferences_text.splitlines():
-                label = Label(window, text = preferences[(c, preference)], padx=10)
+                label = Label(window, text=preferences[(c, preference)], padx=10)
                 label.grid(row=row, column=column)
                 column += 1
         else:
             label = Label(window, text=p1text, padx=10)
             label.grid(row=row, column=column)
-        row +=1
+        row += 1
