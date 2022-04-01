@@ -23,34 +23,44 @@ def feasible_objects(attributes_text, constraints_text, preferences_text, prefer
     attribute_combinations = [c for c in attribute_combinations
                               if clasp_wrapper.clasp(
             convert_combination_and_constraints_to_clasp(c, attributes, hard_constraints))]
-    # objects = ""
-    # for c in attribute_combinations:
-    #     objects += " ".join(model.convert_attribute_combination_to_values(c)) + "\n"
 
     window = Toplevel()
     window.title('Feasible Objects')
     title = Label(window, text='Feasible Objects')
     title.grid(row=1, column=1, columnspan=len(attributes))
 
-    column = 1
+    # column = 1
+    # for a in attributes:
+    #     label = Label(window, text=a.name, padx=10)
+    #     label.grid(row=2, column=column)
+    #     column += 1
+    objects = ""
     for a in attributes:
-        label = Label(window, text=a.name, padx=10)
-        label.grid(row=2, column=column)
-        column += 1
+        objects += a.name + "\t\t"
+    objects += "\n"
 
-    row = 3
     for c in attribute_combinations:
-        column = 1
-        for value in model.convert_attribute_combination_to_values(c):
-            label = Label(window, text=value, padx=10)
-            label.grid(row=row, column=column)
-            column += 1
-        row += 1
+        values = model.convert_attribute_combination_to_values(c)
 
-    # view = Text(window)
-    # view.bind("<Key>", lambda e: "break")
-    # view.insert(END, objects)
-    # view.grid(row=2, column=1)
+        n = 0
+        for value in values:
+            objects += value + "\t\t"
+            n += 1
+        objects += "\n"
+
+    # row = 3
+    # for c in attribute_combinations:
+    #     column = 1
+    #     for value in model.convert_attribute_combination_to_values(c):
+    #         label = Label(window, text=value, padx=10)
+    #         label.grid(row=row, column=column)
+    #         column += 1
+    #     row += 1
+
+    view = Text(window, width=200)
+    view.bind("<Key>", lambda e: "break")
+    view.insert(END, objects)
+    view.grid(row=2, column=1)
     window.mainloop()
 
 
@@ -184,7 +194,6 @@ def exemplification(attributes_text, constraints_text, preferences_text, prefere
             outcometext = 'The objects are equal'
         else:
             outcometext = 'The objects are not comparable'
-
 
     window = Toplevel()
     window.title('Exemplification Objects')
