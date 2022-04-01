@@ -301,10 +301,38 @@ def omni_optimization(attributes_text, constraints_text, preferences_text, prefe
                               if clasp_wrapper.clasp(
             convert_combination_and_constraints_to_clasp(c, attributes, hard_constraints))]
     preferences = calculate_preferences(attributes, attribute_combinations, preferences_text, preferences_type)
+    list = []
+    if preferences_type == 'Penalty':
+        min = 1000000
+        for combination in preferences:
+            penalty = preferences[combination]
+            if penalty < min:
+                list.clear()
+                list.append(combination)
+                min = penalty
+                p1text = penalty
+            elif penalty == min:
+                list.append(combination)
+        
+    elif preferences_type == 'Possibilistic':
+        max = -1
+        for combination in preferences:
+            penalty = preferences[combination]
+            if penalty > max:
+                list.clear()
+                list.append(combination)
+                max = penalty
+                p1text = penalty
+            elif penalty == max:
+                list.append(combination)
+        
+    else:
+        pass
+    
     window = Toplevel()
-    window.title('Omni_optimization Objects')
-    title = Label(window, text='Omni_optimization Objects')
-    title.grid(row=1, column=1, columnspan=len(attributes) + 1)
+    window.title('Omni-Optimization Objects')
+    title = Label(window, text='Omni-Optimization Objects')
+    title.grid(row=1, column=1, columnspan=len(attributes)+1)
 
     column = 1
     for a in attributes:
@@ -312,8 +340,31 @@ def omni_optimization(attributes_text, constraints_text, preferences_text, prefe
         label.grid(row=2, column=column)
         column += 1
 
-    column = 1
-    for value in model.convert_attribute_combination_to_values(c):
-        label = Label(window, text=value, padx=10)
-        label.grid(row=3, column=column)
-        column += 1
+    if preferences_type == 'Penalty':
+        label = Label(window, text='Total Penalty', padx=10)
+        label.grid(row=2, column=column)
+    elif preferences_type == 'Possibilistic':
+        label = Label(window, text='TD', padx=10)
+        label.grid(row=2, column=column)
+    else:
+        for preference in preferences_text.splitlines():
+            label = Label(window, text = preference, padx=10)
+            label.grid(row=2, column=column)  
+            column += 1
+            
+    row = 3
+    for c in list:
+        column = 1
+        for value in model.convert_attribute_combination_to_values((c)):
+            label = Label(window, text=value, padx=10)
+            label.grid(row=row, column=column)
+            column += 1
+        if preferences_type == 'Qualitative':
+            for preference in preferences_text.splitlines():
+                label = Label(window, text = preferences[(c, preference)], padx=10)
+                label.grid(row=row, column=column)
+                column += 1
+        else:
+            label = Label(window, text=p1text, padx=10)
+            label.grid(row=row, column=column)
+        row +=1
