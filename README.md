@@ -8,7 +8,7 @@ The user should then run the main.py file with python which will launch the GUI
 
 The user will need to select the upload file button for the attributes, constraints, 
 and preferences and select the text file when prompted from their directories. When
-selecting preference file, entry preference type when prompted.
+selecting preference file, enter the appropriate preference type when prompted.
 
 The feasible objects shows all the feasible objects based on the attributes specified
 and the hard constraints.
